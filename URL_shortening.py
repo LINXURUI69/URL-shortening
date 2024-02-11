@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import random
 import re
+import json
 
 app = Flask(__name__)
 url_mapping = {}
@@ -20,17 +21,18 @@ def is_valid_url(url):
 @app.route('/<string:url_id>', methods=['GET'])
 def resolve_url(url_id):
     if url_id in url_mapping:
-        return jsonify({'url': url_mapping[url_id]}), 301
+        return jsonify({'value': url_mapping[url_id]}), 301
     else:
         return jsonify({'error': 'URL not found'}), 404
 
 # Create a new URL mapping
 @app.route('/', methods=['POST'])
 def create_url_mapping():
-    data = request.get_json()
-    if 'url' in data and is_valid_url(data['url']):
+    raw_data = request.get_data()
+    data = json.loads(raw_data)
+    if 'value' in data and is_valid_url(data['value']):
         short_id = generate_short_identifier()
-        url_mapping[short_id] = data['url']
+        url_mapping[short_id] = data['value']
         return jsonify({'id': short_id}), 201
     else:
         return jsonify({'error': 'Invalid URL'}), 400
@@ -47,11 +49,8 @@ def delete_url_mapping(url_id):
 # Delete all URL mappings
 @app.route('/', methods=['DELETE'])
 def delete_all_url_mappings():
-    if len(url_mapping) == 0:
-        return jsonify({'error': 'No URL mappings to delete'}), 404
-    else:
-        url_mapping.clear()
-        return '', 204
+    url_mapping.clear()
+    return '', 404
 
 # Get all url mappings
 @app.route('/', methods=['GET'])
@@ -64,11 +63,12 @@ def get_all_url_mappings():
 # Update a URL mapping
 @app.route('/<string:url_id>', methods=['PUT']) 
 def update_url_mapping(url_id):
-    data = request.get_json()
+    raw_data = request.get_data()
+    data = json.loads(raw_data)
     if url_id in url_mapping:
         if 'url' in data and is_valid_url(data['url']):
             url_mapping[url_id] = data['url']
-            return '', 200
+            return jsonify({'url': data['url'],'id': url_id}), 200
         else:
             return jsonify({'error': 'Invalid URL'}), 400
     else:
