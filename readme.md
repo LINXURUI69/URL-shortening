@@ -10,7 +10,7 @@ pip install -r requirements.txt
 python3 URL_shortening.py
 ```
 3. The service will start running locally on http://127.0.0.1:5000/
-4. Run the test file
+4. Run the test file:
 ```
 python3 -s test_1_marking_mk2.py 
 ```
