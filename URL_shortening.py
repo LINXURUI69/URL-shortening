@@ -46,6 +46,7 @@ def create_url_mapping():
     if 'value' in data and is_valid_url(data['value']):
         length = len(url_mapping) + 1
         short_id = generate_short_id(length)
+        #short_id = generate_short_identifier()
         url_mapping[short_id] = data['value']
         return jsonify({'id': short_id}), 201
     else:
