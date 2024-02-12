@@ -7,10 +7,23 @@ app = Flask(__name__)
 url_mapping = {}
 
 # Generate a short identifier for a new URL
-def generate_short_identifier():
+def generate_short_id(length):
+    chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    chars_arr = list(chars)
+    radix = len(chars);
+    quotient = int(length);
+    arr = []
+    while quotient:
+        mod = quotient % radix
+        quotient = (quotient - mod) //radix
+        arr.insert(0, chars_arr[mod])
+    return ''.join(arr)
+
+# Generate a short identifier for a new URL
+'''def generate_short_identifier():
     characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     short_id = ''.join(random.choice(characters) for i in range(6))  # Generate a 6-character short ID
-    return short_id
+    return short_id'''
 
 # Check URL validity using a regex expression
 def is_valid_url(url):
@@ -31,7 +44,8 @@ def create_url_mapping():
     raw_data = request.get_data()
     data = json.loads(raw_data)
     if 'value' in data and is_valid_url(data['value']):
-        short_id = generate_short_identifier()
+        length = len(url_mapping) + 1
+        short_id = generate_short_id(length)
         url_mapping[short_id] = data['value']
         return jsonify({'id': short_id}), 201
     else:
