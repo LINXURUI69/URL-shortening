@@ -26,6 +26,7 @@ def generate_short_id(length):
     return short_id'''
 
 # Check URL validity using a regex expression
+# pattern cited from https://medium.com/@dilarauluturhan/javascript-regex-regular-expressions-e4485ffe719c
 def is_valid_url(url):
     pattern = r'^(https?|ftp):\/\/[^\s\/$.?#].[^\s]*$'
     return re.match(pattern, url) is not None
