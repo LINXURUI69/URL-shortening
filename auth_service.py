@@ -9,7 +9,6 @@ import database
 
 app = Flask(__name__)
 database.create_user_table()
-database.clear_user_table()
 
 # 模拟的用户数据库
 users = {}
@@ -65,7 +64,7 @@ def login():
     password = data.get('password')
     if database.verify_user(username, password):
         token = create_jwt(username)
-        return jsonify(token), 200
+        return jsonify({'token': token}), 200
     return jsonify({'detail':'forbidden'}), 403
 
 # 运行Flask应用

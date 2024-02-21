@@ -6,6 +6,8 @@ import base64
 import hmac
 import hashlib
 
+import database
+
 app = Flask(__name__)
 url_mapping = {}
 secret = 'webservice-group-18'
@@ -75,13 +77,18 @@ def is_valid_url(url):
     return re.match(pattern, url) is not None
 
 def get_username(token):
-    token = token.split(' ')[1]
     header, payload, signature = token.split('.')
     username = bytes_decode(payload).get('sub')
     return username
 
 def is_username_match(token, url_id):
     return get_username(token) == url_mapping[url_id]['username']
+
+def is_user_in_mapping(username):
+    for key in url_mapping:
+        if url_mapping[key]['username'] == username:
+            return True
+    return False
 
 # Resolve a short identifier to a full URL
 @app.route('/<string:url_id>', methods=['GET'])
@@ -90,7 +97,7 @@ def resolve_url(url_id):
     if url_id in url_mapping:
         if not is_username_match(token, url_id):
             return jsonify({'detail': 'forbidden'}), 403
-        return jsonify({'value': url_mapping[url_id]}), 301
+        return jsonify({'value': url_mapping[url_id].get('value')}), 301
     else:
         return jsonify({'error': 'URL not found'}), 404
 
@@ -100,7 +107,8 @@ def create_url_mapping():
     token = request.headers.get('Authorization')
     if token is None:
         return jsonify({'detail': 'forbidden'}), 403
-
+    if database.is_existing_user(get_username(token)) is False:
+        return jsonify({'detail': 'forbidden'}), 403
     raw_data = request.get_data()
     data = json.loads(raw_data)
     if 'value' in data and is_valid_url(data['value']):
@@ -116,27 +124,42 @@ def create_url_mapping():
 @app.route('/<string:url_id>', methods=['DELETE'])
 def delete_url_mapping(url_id):
     token = request.headers.get('Authorization')
+    if token is None:
+        return jsonify({'detail': 'forbidden'}), 403
+    if not url_id in url_mapping:
+        return jsonify({'error': 'URL not found'}), 404
     if url_id in url_mapping:
         if not is_username_match(token, url_id):
             return jsonify({'detail': 'forbidden'}), 403
         del url_mapping[url_id]
         return '', 204
-    else:
-        return jsonify({'error': 'URL not found'}), 404
 
 # Delete all URL mappings
 @app.route('/', methods=['DELETE'])
 def delete_all_url_mappings():
+    token = request.headers.get('Authorization')
+    if token is None:
+        return jsonify({'detail': 'forbidden'}), 403
+    if not is_user_in_mapping(get_username(token)):
+        return jsonify({'detail': 'forbidden'}), 403
     url_mapping.clear()
     return '', 404
 
 # Get all url mappings
 @app.route('/', methods=['GET'])
 def get_all_url_mappings():
+    token = request.headers.get('Authorization')
+    if not is_user_in_mapping(get_username(token)):
+        return jsonify({'detail': 'forbidden'}), 403
     if len(url_mapping) == 0:
         return jsonify({'error': 'No URL mappings found'}), 404
     else:
-        return jsonify(url_mapping), 200
+        tmp_map = {}
+        for url_id in url_mapping:
+            if url_mapping[url_id]['username'] == get_username(token):
+                tmp_map[url_id] = url_mapping[url_id]['value']
+        return jsonify(tmp_map), 200
+
     
 # Update a URL mapping
 @app.route('/<string:url_id>', methods=['PUT']) 
@@ -148,7 +171,7 @@ def update_url_mapping(url_id):
         if not is_username_match(token, url_id):
             return jsonify({'detail': 'forbidden put'}), 403
         if 'url' in data and is_valid_url(data['url']):
-            url_mapping[url_id] = data['url']
+            url_mapping[url_id]['value'] = data['url']
             return jsonify({'url': data['url'],'id': url_id}), 200
         else:
             return jsonify({'error': 'Invalid URL'}), 400
