@@ -165,7 +165,7 @@ def get_all_url_mappings():
     token = request.headers.get('Authorization')
     if is_valid_jwt(token) is False:
         return jsonify({'detail': 'forbidden'}), 403
-    if is_user_in_mapping(get_username(token)) is False:
+    if database.is_existing_user(get_username(token)) is False:
         return jsonify({'detail': 'forbidden'}), 403
     if len(url_mapping) == 0:
         return jsonify({'error': 'No URL mappings found'}), 404
@@ -187,7 +187,7 @@ def update_url_mapping(url_id):
     data = json.loads(raw_data)
     if url_id in url_mapping:
         if is_username_match(token, url_id) is False:
-            return jsonify({'detail': 'forbidden put'}), 403
+            return jsonify({'detail': 'forbidden'}), 403
         if 'url' in data and is_valid_url(data['url']):
             url_mapping[url_id]['value'] = data['url']
             return jsonify({'url': data['url'],'id': url_id}), 200
