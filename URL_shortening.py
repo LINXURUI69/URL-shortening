@@ -5,7 +5,6 @@ import json
 import base64
 import hmac
 import hashlib
-
 import database
 
 app = Flask(__name__)

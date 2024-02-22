@@ -4,7 +4,6 @@ import base64
 import hmac
 import hashlib
 import sqlite3
-import bcrypt
 import database
 
 app = Flask(__name__)
