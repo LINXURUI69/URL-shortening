@@ -8,8 +8,22 @@ import hashlib
 import database
 
 app = Flask(__name__)
-url_mapping = {}
+
 secret = 'webservice-group-18'
+
+#url data saving and loading
+def save_data(data, filename='url_mapping.json'):
+    with open(filename, 'w') as file:
+        json.dump(data, file)
+
+def load_data(filename='url_mapping.json'):
+    try:
+        with open(filename, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return {}
+    
+url_mapping = load_data()
 
 # Generate a short identifier for a new URL
 def generate_short_id(length):
@@ -119,9 +133,9 @@ def resolve_url(url_id):
 def create_url_mapping():
     token = request.headers.get('Authorization')
     if is_valid_jwt(token) is False:
-        return jsonify({'detail': 'forbidden'}), 403
+        return jsonify({'detail': 'forbidden 01'}), 403
     if database.is_existing_user(get_username(token)) is False:
-        return jsonify({'detail': 'forbidden'}), 403
+        return jsonify({'detail': get_username(token)}), 403
     raw_data = request.get_data()
     data = json.loads(raw_data)
     if 'value' in data and is_valid_url(data['value']):
@@ -129,6 +143,7 @@ def create_url_mapping():
         short_id = generate_short_id(length)
         #short_id = generate_short_identifier()
         url_mapping[short_id] = {'value': data['value'], 'username': get_username(token)}
+        save_data(url_mapping)
         return jsonify({'id': short_id}), 201
     else:
         return jsonify({'error': 'Invalid URL'}), 400
@@ -145,6 +160,7 @@ def delete_url_mapping(url_id):
         if not is_username_match(token, url_id):
             return jsonify({'detail': 'forbidden'}), 403
         del url_mapping[url_id]
+        save_data(url_mapping)
         return '', 204
 
 # Delete all URL mappings
@@ -156,6 +172,7 @@ def delete_all_url_mappings():
     if database.is_existing_user(get_username(token)) is False:
         return jsonify({'detail': 'forbidden'}), 403
     del_urls_by_username(get_username(token))
+    save_data(url_mapping)
     return '', 404
 
 # Get all url mappings
@@ -189,6 +206,7 @@ def update_url_mapping(url_id):
             return jsonify({'detail': 'forbidden'}), 403
         if 'url' in data and is_valid_url(data['url']):
             url_mapping[url_id]['value'] = data['url']
+            save_data(url_mapping)
             return jsonify({'url': data['url'],'id': url_id}), 200
         else:
             return jsonify({'error': 'Invalid URL'}), 400

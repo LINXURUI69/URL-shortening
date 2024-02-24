@@ -7,10 +7,11 @@ import sqlite3
 import database
 
 app = Flask(__name__)
-database.create_user_table()
 
-# 模拟的用户数据库
-users = {}
+@app.before_request
+def initialize_database():
+    database.create_user_table()
+
 
 # 生成JWT的函数
 def create_jwt(username):

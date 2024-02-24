@@ -1,0 +1,20 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY ./auth_service.py /app/
+COPY ./clear_database.py /app/
+COPY ./database.py /app/
+COPY ./show_database.py /app/
+COPY ./test_app.py /app/
+COPY ./test_auth.py /app/
+COPY ./read_from.csv /app/
+COPY ./requirements.txt /app/
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 5001
+
+ENV FLASK_APP=auth_service.py
+
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5001"]

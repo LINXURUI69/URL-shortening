@@ -2,7 +2,7 @@ import sqlite3
 
 
 def clear_user_table():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('/app/users.db')
     c = conn.cursor()
     c.execute('''
         DELETE FROM users
@@ -10,7 +10,7 @@ def clear_user_table():
     conn.commit()
     conn.close()
 def create_user_table():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('/app/users.db')
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
@@ -22,7 +22,7 @@ def create_user_table():
     conn.close()
 
 def register_user(username, password):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('/app/users.db')
     c = conn.cursor()
     c.execute('''
         INSERT INTO users (username, password) VALUES (?, ?)
@@ -31,7 +31,7 @@ def register_user(username, password):
     conn.close()
 
 def verify_user(username, password):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('/app/users.db')
     c = conn.cursor()
     c.execute('''
         SELECT password FROM users WHERE username = ?
@@ -43,7 +43,7 @@ def verify_user(username, password):
     return False
 
 def update_password(username, new_password):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('/app/users.db')
     c = conn.cursor()
     c.execute('''
         UPDATE users SET password = ? WHERE username = ?
@@ -52,7 +52,7 @@ def update_password(username, new_password):
     conn.close()
 
 def is_existing_user(username):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('/app/users.db')
     c = conn.cursor()
     c.execute('''
         SELECT username FROM users WHERE username = ?
@@ -62,7 +62,7 @@ def is_existing_user(username):
     return is_exist
 
 def get_password(username):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('/app/users.db')
     c = conn.cursor()
     c.execute('''
         SELECT password FROM users WHERE username = ?

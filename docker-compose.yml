@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  url_shortening:
+    build:
+      context: .
+      dockerfile: Dockerfile.url_shortening
+    volumes:
+      - url_shortening_data:/app
+      - ./users.db:/app/users.db
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=URL_shortening.py
+    command: flask run --host=0.0.0.0
+
+  authentication:
+    build:
+      context: .
+      dockerfile: Dockerfile.authentication
+    volumes:
+      - authentication_data:/app
+      - ./users.db:/app/users.db
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_APP=auth_service.py
+    command: flask run --host=0.0.0.0 --port=5001
+
+volumes:
+  url_shortening_data:
+  authentication_data:
