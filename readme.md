@@ -23,6 +23,7 @@ You can use tools like curl or Postman to test the HTTP endpoints.
 The services are also deployed in a Kubernetes (K8s) cluster and can be tested on the following URLs:
 
 URL-Shortening Service: Exposed at port 31984, accessible via `http://145.100.135.225:31984/`
+
 Authentication Service: Exposed at port 31650, accessible via `http://145.100.135.226:31650/`
 
 Ensure your Kubernetes cluster is correctly set up and accessible before attempting to test these services.
