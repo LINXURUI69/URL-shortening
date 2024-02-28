@@ -6,7 +6,7 @@ import os
 
 class TestApi(unittest.TestCase):
     #with fastapi default port is 8000 with flask is 5000
-    base_url = "http://authentication:5001"
+    base_url = "http://145.100.135.226:31650/"
     
 
     def create_new_user(self, username, password):

@@ -1,21 +1,28 @@
-# Assignment 2: RESTful microservices architectures
-This is a simple URL shortener service implemented in Python using the Flask web framework. The service allows users to shorten long URLs into unique and compact identifiers, making them easier to share and manage. Firstly, users need to create an account with unique 'username' and 'password', then login to get a JWT token. With the token, users are able to manipulating their urls.
-## Getting Started
-1. Install the required dependencies(flask and requests):
+# Homework 3: Virtualization using containers (Docker)
+
+This document outlines the steps required to deploy services using Docker and test them locally and within a Kubernetes (K8s) cluster.
+
+## Deploying Services with `docker-compose`
+
+1. To deploy your services, navigate to the directory containing your `docker-compose.yaml` file and run the following command:
+
+```bash
+docker-compose up
 ```
-pip install -r requirements.txt
-```
-2. Run the Flask web server:
-```
-python(3) URL_shortening.py
-python(3) auth_service.py
-```
-3. The url-shortening service will start running locally on http://127.0.0.1:5000/
- 
-4.   The authentication service will start running locally on http://127.0.0.1:5001/
-   
-5. Run the test file:
-```
-python(3) -s test_1_marking_mk2.py
-python(3) test_auth.py
-```
+## Local Testing
+
+The services are exposed on the following ports for local testing through HTTP methods:
+
+URL-Shortening Service: Available at `localhost:5001`
+Authentication Service: Available at `localhost:5000`
+
+You can use tools like curl or Postman to test the HTTP endpoints.
+
+## Testing in Kubernetes Cluster
+
+The services are also deployed in a Kubernetes (K8s) cluster and can be tested on the following URLs:
+
+URL-Shortening Service: Exposed at port 31984, accessible via `http://145.100.135.225:31984/`
+Authentication Service: Exposed at port 31650, accessible via `http://145.100.135.226:31650/`
+
+Ensure your Kubernetes cluster is correctly set up and accessible before attempting to test these services.
