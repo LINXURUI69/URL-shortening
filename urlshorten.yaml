@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-shortening
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: url-shortening
+  template:
+    metadata:
+      labels:
+        app: url-shortening
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - kubeclass-225
+      volumes:
+        - name: nfs-users-db
+          nfs:
+            server: 145.100.135.148
+            path: /var/nfs/share
+      containers:
+      - name: url-shortening
+        image: zhuoran0219/webservice:1.0
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: nfs-users-db
+          mountPath: /app/users.db
+          subPath: users.db
+        env:
+        - name: FLASK_APP
+          value: "URL_shortening.py"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-shortening-service
+spec:
+  selector:
+    app: url-shortening
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+  type: NodePort
+

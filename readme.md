@@ -27,3 +27,10 @@ URL-Shortening Service: Exposed at port 31984, accessible via `http://145.100.13
 Authentication Service: Exposed at port 31650, accessible via `http://145.100.135.226:31650/`
 
 Ensure your Kubernetes cluster is correctly set up and accessible before attempting to test these services.
+
+## Used files
+
+`Dockerfile.authentication` is used in assignment 3.1 and 3.2
+`Dockerfile.url_shorening` is used in assignment 3.1 and 3.2
+`docker-compose.yaml` is used in assignment 3.1
+`authentication.yaml` and `urlshorten.yaml` are used in assignment 3.2

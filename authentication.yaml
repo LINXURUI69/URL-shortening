@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: authentication
+  template:
+    metadata:
+      labels:
+        app: authentication
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - kubeclass-226
+      volumes:
+        - name: nfs-users-db
+          nfs:
+            server: 145.100.135.148
+            path: /var/nfs/share
+      containers:
+      - name: authentication
+        image: zhuoran0219/authentication:1.0
+        ports:
+        - containerPort: 5001
+        volumeMounts:
+        - name: nfs-users-db
+          mountPath: /app/users.db
+          subPath: users.db
+        env:
+        - name: FLASK_APP
+          value: "auth_service.py"
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentication-service
+spec:
+  selector:
+    app: authentication
+  ports:
+  - protocol: TCP
+    port: 5001
+    targetPort: 5001
+  type: NodePort
+
